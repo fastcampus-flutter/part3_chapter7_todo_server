@@ -16,6 +16,8 @@ class Todo {
   })  : createdTime = createdTime ?? DateTime.now(),
         status = status ?? TodoStatus.incomplete;
 
+  factory Todo.fromJson(Map<String, Object?> json) => _$TodoFromJson(json);
+
   int id;
   String title;
   final DateTime createdTime;
@@ -23,7 +25,12 @@ class Todo {
   DateTime dueDate;
   TodoStatus status;
 
-  factory Todo.fromJson(Map<String, Object?> json) => _$TodoFromJson(json);
-
   Map<String, dynamic> toJson() => _$TodoToJson(this);
+
+  void update(Todo todo) {
+    title = todo.title;
+    modifyTime = todo.modifyTime;
+    dueDate = todo.dueDate;
+    status = todo.status;
+  }
 }
