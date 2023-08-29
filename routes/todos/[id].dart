@@ -13,7 +13,6 @@ Future<Response> onRequest(RequestContext context, String stringId) async {
     case HttpMethod.put:
       final todo = await getTodo(request);
       final savedTodo = todoList.firstWhere((element) => element.id == id);
-      print('savedTodoUpdate: ${todo.status}');
       savedTodo.update(todo);
       return Response(
         statusCode: 201,
