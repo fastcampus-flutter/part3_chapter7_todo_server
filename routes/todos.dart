@@ -5,6 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 import '../vo/vo_todo.dart';
 
 List<Todo> todoList = [];
+final commonHeader = {'Content-Type': 'application/json'};
 
 Future<Response> onRequest(RequestContext context) async {
   final request = context.request;
@@ -12,7 +13,17 @@ Future<Response> onRequest(RequestContext context) async {
 
   switch (method) {
     case HttpMethod.get:
+      if (todoList.isEmpty) {
+        Response(
+          statusCode: 404,
+          headers: commonHeader,
+          body: '{"errorMessage": "저장된 Todo 데이터가 없습니다."}',
+        );
+      }
+
       return Response(
+        statusCode: 200,
+        headers: commonHeader,
         body: json.encode(
           todoList.map((e) => e.toJson()).toList(),
         ),
@@ -20,24 +31,26 @@ Future<Response> onRequest(RequestContext context) async {
     case HttpMethod.post:
       final todo = await getTodo(request);
       todoList.add(todo);
-
+      return Response(
+        statusCode: 201,
+        headers: commonHeader,
+      );
     case HttpMethod.put:
-      final todo = await getTodo(request);
-      final savedTodo = todoList.firstWhere((element) => element.id == todo.id);
-      savedTodo.update(todo);
-
     case HttpMethod.delete:
-      final body = await request.body();
-      final id = int.parse(body);
-      todoList.removeWhere((element) => element.id == id);
-
+      return Response(
+        statusCode: 400,
+        body: '{"errorMessage": "path에 id값을 추가해주세요."}',
+        headers: commonHeader,
+      );
+    case HttpMethod.head:
     case HttpMethod.options:
     case HttpMethod.patch:
-    case HttpMethod.head:
-      return Response(statusCode: 500, body: "{error 발생}");
+      return Response(
+        statusCode: 500,
+        body: '{"errorMessage": "지원하지 않는 method입니다."}',
+        headers: commonHeader,
+      );
   }
-
-  return Response(body: 'This is a new route!');
 }
 
 Future<Todo> getTodo(Request request) async {
