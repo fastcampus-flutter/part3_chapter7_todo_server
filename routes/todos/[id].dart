@@ -11,8 +11,18 @@ Future<Response> onRequest(RequestContext context, String stringId) async {
 
   switch (method) {
     case HttpMethod.put:
+    case HttpMethod.post:
       final todo = await getTodo(request);
-      final savedTodo = todoList.firstWhere((element) => element.id == id);
+      final savedTodo = todoList.firstWhereOrNull(
+        (element) => element.id == id,
+      );
+      if (savedTodo == null) {
+        todoList.add(todo);
+        return Response(
+          statusCode: 201,
+          headers: commonHeader,
+        );
+      }
       savedTodo.update(todo);
       return Response(
         statusCode: 201,
@@ -25,7 +35,6 @@ Future<Response> onRequest(RequestContext context, String stringId) async {
         headers: commonHeader,
       );
     case HttpMethod.get:
-    case HttpMethod.post:
     case HttpMethod.options:
     case HttpMethod.patch:
     case HttpMethod.head:
@@ -34,5 +43,14 @@ Future<Response> onRequest(RequestContext context, String stringId) async {
         body: '{"errorMessage": "지원하지 않는 method입니다"}',
         headers: commonHeader,
       );
+  }
+}
+
+extension FirstWhereOrNullExtension<E> on Iterable<E> {
+  E? firstWhereOrNull(bool Function(E) test) {
+    for (final element in this) {
+      if (test(element)) return element;
+    }
+    return null;
   }
 }

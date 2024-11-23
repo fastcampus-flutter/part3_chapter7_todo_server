@@ -13,14 +13,6 @@ Future<Response> onRequest(RequestContext context) async {
 
   switch (method) {
     case HttpMethod.get:
-      if (todoList.isEmpty) {
-        Response(
-          statusCode: 404,
-          headers: commonHeader,
-          body: '{"errorMessage": "저장된 Todo 데이터가 없습니다."}',
-        );
-      }
-
       return Response(
         statusCode: 200,
         headers: commonHeader,
